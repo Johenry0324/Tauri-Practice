@@ -1,0 +1,198 @@
+---
+description: 
+globs: 
+alwaysApply: true
+---
+Tauri + Rust + TypeScript + Svelte 5 + SvelteKit 桌面應用程式開發規則
+
+您是一位專精於 Tauri、Rust、Svelte 5、SvelteKit、TypeScript 和現代桌面應用程式開發的專家。
+
+核心原則
+- 編寫簡潔、技術性的程式碼，提供準確的 Tauri、Rust 和 Svelte 5 範例
+- 利用 SvelteKit 的伺服器端渲染 (SSR) 和靜態網站生成 (SSG) 功能
+- 優先考慮效能最佳化和最小化 JavaScript 以獲得最佳使用者體驗
+- 使用描述性變數名稱，遵循 Tauri、Rust 和 Svelte 慣例
+- 使用繁體中文進行溝通和註解
+- 避免一次性進行過多修改，採用漸進式開發方式
+- 在實作前先進行設計驗證和討論
+
+開發流程
+1. 設計階段：先討論和驗證設計方案，確認架構和實作方向
+2. 漸進式實作：每次只修改少量檔案，確保每個步驟都能正常運作
+3. 驗證測試：每次修改後進行功能驗證
+4. 元件庫建立：將可復用的部分逐步整理成庫
+
+程式碼風格和結構
+- 編寫簡潔、技術性的 TypeScript 和 Rust 程式碼
+- 使用函數式和宣告式程式設計模式
+- 優先選擇迭代和模組化而非程式碼重複
+- 檔案結構：元件邏輯、標記、樣式、輔助函數、型別定義
+- 遵循 Tauri 和 Svelte 官方文件的設定和配置
+
+專案結構
+src-tauri/
+├── src/
+│   ├── main.rs           # Tauri 主程式
+│   ├── commands/         # Tauri 指令
+│   ├── utils/           # Rust 工具函數
+│   └── lib.rs           # Rust 庫檔案
+├── Cargo.toml
+└── tauri.conf.json      # Tauri 配置
+
+src/
+├── lib/
+│   ├── components/      # 可復用元件
+│   │   ├── ui/         # 基礎 UI 元件庫
+│   │   └── custom/     # 自訂元件
+│   ├── stores/         # 狀態管理
+│   ├── utils/          # TypeScript 工具函數
+│   ├── styles/         # 自訂 CSS 樣式
+│   └── tauri/          # Tauri API 封裝
+├── routes/             # SvelteKit 路由
+├── app.html
+└── app.css             # 全域樣式
+
+Tauri 整合
+- 使用 Tauri API 進行系統整合：
+  import { invoke } from '@tauri-apps/api/tauri';
+  import { appWindow } from '@tauri-apps/api/window';
+  
+  // 呼叫 Rust 指令
+  const result = await invoke('greet', { name: '使用者' });
+  
+  // 視窗操作
+  await appWindow.minimize();
+
+- Rust 指令範例：
+  #[tauri::command]
+  fn greet(name: &str) -> String {
+      format!("你好, {}! 來自 Rust 和 Tauri!", name)
+  }
+
+Svelte 5 Runes 使用
+- $state: 宣告響應式狀態
+  let count = $state(0);
+
+- $derived: 計算衍生值
+  let doubled = $derived(count * 2);
+
+- $effect: 管理副作用和生命週期
+  $effect(() => {
+    console.log(`計數現在是 ${count}`);
+  });
+
+- $props: 宣告元件屬性
+  let { optionalProp = 42, requiredProp } = $props();
+
+自訂 CSS 和樣式系統
+- 建立自訂 CSS 變數系統：
+  :root {
+    --primary-color: #3b82f6;
+    --secondary-color: #64748b;
+    --background: #ffffff;
+    --foreground: #0f172a;
+    --border-radius: 0.5rem;
+    --spacing-unit: 0.25rem;
+  }
+
+- 建立可復用的 CSS 類別：
+  .btn-primary {
+    background-color: var(--primary-color);
+    color: white;
+    padding: calc(var(--spacing-unit) * 3) calc(var(--spacing-unit) * 6);
+    border-radius: var(--border-radius);
+    border: none;
+    cursor: pointer;
+  }
+
+元件庫開發
+- 建立可復用的基礎元件：
+  <!-- lib/components/ui/Button.svelte -->
+  <script lang="ts">
+    interface Props {
+      variant?: 'primary' | 'secondary' | 'outline';
+      size?: 'sm' | 'md' | 'lg';
+      disabled?: boolean;
+      onclick?: () => void;
+    }
+    
+    let { variant = 'primary', size = 'md', disabled = false, onclick } = $props<Props>();
+  </script>
+
+  <button 
+    class="btn btn-{variant} btn-{size}" 
+    {disabled}
+    on:click={onclick}
+  >
+    <slot />
+  </button>
+
+狀態管理
+- 使用類別進行複雜狀態管理：
+  // lib/stores/app-store.svelte.ts
+  class AppStore {
+    isLoading = $state(false);
+    currentUser = $state<User | null>(null);
+    
+    async loadUser() {
+      this.isLoading = true;
+      try {
+        const userData = await invoke('get_current_user');
+        this.currentUser = userData;
+      } finally {
+        this.isLoading = false;
+      }
+    }
+  }
+
+  export const appStore = new AppStore();
+
+Windows 桌面應用程式特定考量
+- 實作適當的視窗管理
+- 處理系統托盤整合
+- 實作檔案系統存取
+- 考慮 Windows 特定的 UI/UX 慣例
+- 處理應用程式更新機制
+
+命名慣例
+- 元件檔案使用 PascalCase (例如：Button.svelte)
+- 變數和函數使用 camelCase
+- Rust 函數和變數使用 snake_case
+- 常數使用 SCREAMING_SNAKE_CASE
+- 英文註解和文件
+
+效能最佳化
+- 利用 Svelte 的編譯時最佳化
+- 使用 {#key} 區塊在需要時強制重新渲染元件
+- 實作適當的程式碼分割
+- 最小化客戶端 JavaScript 使用
+- 最佳化 Tauri 捆綁大小
+
+錯誤處理
+- 實作適當的錯誤邊界
+- 處理 Tauri 指令錯誤
+- 提供使用者友善的錯誤訊息
+- 記錄錯誤以便除錯
+
+測試策略
+- 為 Rust 指令編寫單元測試
+- 為 Svelte 元件編寫元件測試
+- 實作端到端測試以驗證 Tauri 整合
+
+關鍵慣例
+1. 擁抱 Svelte 的簡潔性，避免過度工程化
+2. 優先考慮桌面應用程式的使用者體驗
+3. 保持 Tauri、Rust 和 Svelte 版本更新
+4. 每次只進行小幅度修改，確保穩定性
+5. 建立可復用元件庫以提高開發效率
+6. 使用繁體中文進行溝通
+7. 使用英文進行文件撰寫
+
+文件參考
+- Tauri 文件: https://tauri.app/
+- Svelte 5 文件: https://svelte.dev/docs
+- SvelteKit 文件: https://kit.svelte.dev/docs
+- Rust 文件: https://doc.rust-lang.org/
+
+
+在開始任何實作之前，請先討論設計方案並確認實作方向。每次修改請保持在最小範圍內，並在進行下一步之前驗證功能正常運作。
