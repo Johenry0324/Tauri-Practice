@@ -1,0 +1,37 @@
+[package]
+name = "app"
+version = "0.1.0"
+description = "A Tauri App"
+authors = ["you"]
+license = ""
+repository = ""
+# 指定預設執行檔案
+default-run = "app"
+edition = "2021"
+# Rust 最低版本要求
+rust-version = "1.60"
+
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+
+[lib]
+name = "app_lib"
+# 支援多種庫類型，確保與 Tauri 相容
+crate-type = ["staticlib", "cdylib", "rlib"]
+
+[build-dependencies]
+# Tauri 建置工具，用於編譯時處理
+tauri-build = { version = "2.0", features = [] }
+
+[dependencies]
+# JSON 序列化/反序列化，用於前後端資料交換
+serde_json = "1.0"
+# 序列化框架，支援 derive 巨集自動生成序列化程式碼
+serde = { version = "1.0", features = ["derive"] }
+# 日誌記錄庫
+log = "0.4"
+# Tauri 核心框架，啟用 macOS 私有 API 支援
+tauri = { version = "2.0", features = [] }
+# Tauri 日誌外掛，提供日誌功能
+tauri-plugin-log = "2.0"
+# 添加 tokio 以支援異步延遲
+tokio = { version = "1.0", features = ["time"] }
